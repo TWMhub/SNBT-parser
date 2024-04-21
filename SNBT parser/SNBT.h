@@ -61,6 +61,9 @@ namespace depozit {
 	private:
 		std::vector<std::wstring> readFileByVecWstring(fs::path);
 		std::vector<text> parsing();
+		void getTitle(unsigned, std::wstring);
+		void getSubtitle(unsigned, std::wstring);
+		void getDescription(unsigned, unsigned, const std::vector<std::wstring>&);
 	//vars
 	private:
 		std::wstring fullFile;

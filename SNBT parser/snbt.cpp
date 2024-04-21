@@ -62,8 +62,41 @@ namespace depozit
 		if(this->fullFile.find(L"quests") != std::wstring::npos){
 			for (int i = fullFile.find(L"quests"); i < this->fileByLine.size(); i++) {
 				//дописать
+				if (fileByLine[i].find(L"subtitle") != std::wstring::npos) {
+					getSubtitle(i, fileByLine[i]);
+				}
+				else if (fileByLine[i].find(L"title") != std::wstring::npos) {
+					getTitle(i, fileByLine[i]);
+				}
+				else if (fileByLine[i].find(L"description") != std::wstring::npos) {
+					//this->arrayTexts.push_back(getDescription(fileByLine[i], i));
+					//тут должна быть обработка строк, а не строки
+					for (int j = i; j < this->fileByLine.size(); j++) {
+						if (this->fileByLine[j].find(L"]") != std::wstring::npos) {
+							getDescription(i, j, fileByLine);
+							i = j;
+							break;
+						}
+					}
+				}
 			}
+		}
+		else {
+			std::cerr << "for unknown reasons, \"quests\" is missing from the file\n";
 		}
 		return text;
 	}
+	void snbt::getTitle(unsigned i, std::wstring line) {
+		if (line.find(L"{") == std::wstring::npos) {
+			depozit::text out(i, type::title, line.substr(line.find_first_of(L"\"") + 1, line.find_last_of(L"\"") - 1));
+			this->arrayTexts.push_back(out);
+		}
+	}
+	void snbt::getSubtitle(unsigned i, std::wstring line) {
+		if (line.find(L"{") == std::wstring::npos) {
+			depozit::text out(i, type::subtitle, line.substr(line.find_first_of(L"\"") + 1, line.find_last_of(L"\"") - 1));
+			this->arrayTexts.push_back(out);
+		}
+	}
+
 }
