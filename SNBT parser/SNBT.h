@@ -20,7 +20,7 @@ namespace depozit {
 
 	class text
 	{
-		//functuions
+	//functuions
 	public:
 		text();
 		text(unsigned, type, std::wstring);
@@ -36,7 +36,8 @@ namespace depozit {
 
 		std::wstring typeToWstring(depozit::type);
 		void clear();
-		//vars
+
+	//vars
 	private:
 		unsigned posInFile;
 		type type;
@@ -60,7 +61,7 @@ namespace depozit {
 		void clear();
 	private:
 		std::vector<std::wstring> readFileByVecWstring(fs::path);
-		std::vector<text> parsing();
+		void parsing();
 		void getTitle(unsigned, std::wstring);
 		void getSubtitle(unsigned, std::wstring);
 		void getDescription(unsigned, unsigned, const std::vector<std::wstring>&);

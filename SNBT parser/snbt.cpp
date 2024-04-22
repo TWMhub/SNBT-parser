@@ -3,22 +3,20 @@
 namespace depozit 
 {
 	//public
-	snbt::snbt() {};
+	snbt::snbt() {
+		this->fullFile=L"";
+	};
 	snbt::snbt(fs::path pathToSnbtFile) {
 		this->fileByLine = readFileByVecWstring(pathToSnbtFile);
-		this->arrayTexts = parsing();
+		parsing();
 	}
 	void snbt::init(fs::path pathToSnbtFile) {
 		this->fileByLine = readFileByVecWstring(pathToSnbtFile);
-		this->arrayTexts = parsing();
+		parsing();
 	}
 
 	std::wstring snbt::getFileByWstring() {
-		std::wstring out = L"";
-		for (int i = 0; i < this->fileByLine.size(); i++) {
-			out += fileByLine[i];
-		}
-		return out;
+		return this->fullFile;
 	}
 	std::wstring snbt::getTextsByWstring() {
 		std::wstring out = L"";
@@ -47,21 +45,21 @@ namespace depozit
 	//private
 	std::vector<std::wstring> snbt::readFileByVecWstring(fs::path path) {
 		std::wifstream file(path);
-		std::vector<std::wstring> fileByLine;
-		std::wstring line;
-		std::wstring fullFile;
-		while (std::getline(file, line)) {
-			fileByLine.push_back(line);
-			fullFile += line + L"\n";
+		if(file.is_open()){
+			std::vector<std::wstring> fileByLine;
+			std::wstring line;
+			std::wstring fullFile;
+			while (std::getline(file, line)) {
+				fileByLine.push_back(line);
+				fullFile += line + L"\n";
+			}
+			this->fullFile = fullFile;
+			return fileByLine;
 		}
-		this->fullFile = fullFile;
-		return fileByLine;
 	}
-	std::vector<text> snbt::parsing() {
-		std::vector<text> text;
+	void snbt::parsing() {
 		if(this->fullFile.find(L"quests") != std::wstring::npos){
 			for (int i = fullFile.find(L"quests"); i < this->fileByLine.size(); i++) {
-				//дописать
 				if (fileByLine[i].find(L"subtitle") != std::wstring::npos) {
 					getSubtitle(i, fileByLine[i]);
 				}
@@ -69,8 +67,6 @@ namespace depozit
 					getTitle(i, fileByLine[i]);
 				}
 				else if (fileByLine[i].find(L"description") != std::wstring::npos) {
-					//this->arrayTexts.push_back(getDescription(fileByLine[i], i));
-					//тут должна быть обработка строк, а не строки
 					for (int j = i; j < this->fileByLine.size(); j++) {
 						if (this->fileByLine[j].find(L"]") != std::wstring::npos) {
 							getDescription(i, j, fileByLine);
@@ -84,19 +80,34 @@ namespace depozit
 		else {
 			std::cerr << "for unknown reasons, \"quests\" is missing from the file\n";
 		}
-		return text;
 	}
 	void snbt::getTitle(unsigned i, std::wstring line) {
 		if (line.find(L"{") == std::wstring::npos) {
-			depozit::text out(i, type::title, line.substr(line.find_first_of(L"\"") + 1, line.find_last_of(L"\"") - 1));
-			this->arrayTexts.push_back(out);
+			depozit::text out(i, type::title, line.substr(line.find_first_of(L"\"") + 1, 
+			line.find_first_of(L"\"") - line.find_last_of(L"\"") - 1));
+			if(out.getOriginalText().length() > 0)
+				this->arrayTexts.push_back(out);
 		}
 	}
 	void snbt::getSubtitle(unsigned i, std::wstring line) {
 		if (line.find(L"{") == std::wstring::npos) {
-			depozit::text out(i, type::subtitle, line.substr(line.find_first_of(L"\"") + 1, line.find_last_of(L"\"") - 1));
-			this->arrayTexts.push_back(out);
+			depozit::text out(i, type::subtitle, line.substr(line.find_first_of(L"\"") + 1, 
+			line.find_last_of(L"\"") - line.find_first_of(L"\"") - 1));
+			if(out.getOriginalText().length() > 0)
+				this->arrayTexts.push_back(out);
 		}
 	}
-
+	void snbt::getDescription(unsigned i, unsigned j, const std::vector<std::wstring>& fileByLine){
+		size_t start;
+		size_t end;
+		depozit::text out;
+		for(i; i<=j; i++){
+			start = fileByLine[i].find_first_of(L"\"");
+			end = fileByLine[i].find_last_of(L"\"");
+			out.init(i, type::description, fileByLine[i].substr(start + 1, end - start - 1));
+			if(out.getOriginalText().length() > 0 && out.getOriginalText().find(L"{") == std::wstring::npos)
+				this->arrayTexts.push_back(out);
+			out.clear();
+		}
+	}
 }
