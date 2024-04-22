@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <vector>
 #include <fstream>
+#include <Windows.h>
 
 namespace fs = std::filesystem;
 
@@ -17,6 +18,9 @@ namespace depozit {
 		description,
 		unknown
 	};
+
+	std::wstring stringToWstring(const std::string& str);
+	std::string wstringToString(const std::wstring& wstr);
 
 	class text
 	{

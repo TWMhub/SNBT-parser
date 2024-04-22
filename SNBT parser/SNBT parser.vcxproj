@@ -132,6 +132,7 @@
     <ClInclude Include="SNBT.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="depozit.cpp" />
     <ClCompile Include="snbt.cpp" />
     <ClCompile Include="text.cpp" />
   </ItemGroup>

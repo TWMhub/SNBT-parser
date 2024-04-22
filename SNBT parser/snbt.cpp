@@ -25,7 +25,7 @@ namespace depozit
 				out += std::to_wstring(this->arrayTexts[i].getPosInFile()) + L":";
 				out += this->arrayTexts[i].getTypeByWstring() + L":";
 				out += this->arrayTexts[i].getOriginalText() + L":";
-				out += this->arrayTexts[i].getTranslatedString();
+				out += this->arrayTexts[i].getTranslatedString() + L"\n";
 			}
 		}
 		return out;
@@ -59,7 +59,14 @@ namespace depozit
 	}
 	void snbt::parsing() {
 		if(this->fullFile.find(L"quests") != std::wstring::npos){
-			for (int i = fullFile.find(L"quests"); i < this->fileByLine.size(); i++) {
+			int startLine = 0;
+			for (int i = 0; i < fileByLine.size(); i++) {
+				if (fileByLine[i].find(L"quests") == std::wstring::npos) {
+					startLine = i;
+					break;
+				}
+			}
+			for (int i = startLine; i < this->fileByLine.size(); i++) {
 				if (fileByLine[i].find(L"subtitle") != std::wstring::npos) {
 					getSubtitle(i, fileByLine[i]);
 				}
@@ -83,8 +90,8 @@ namespace depozit
 	}
 	void snbt::getTitle(unsigned i, std::wstring line) {
 		if (line.find(L"{") == std::wstring::npos) {
-			depozit::text out(i, type::title, line.substr(line.find_first_of(L"\"") + 1, 
-			line.find_first_of(L"\"") - line.find_last_of(L"\"") - 1));
+			depozit::text out(i, type::title, line.substr(line.find_first_of(L"\"") + 1,
+				line.find_last_of(L"\"") - line.find_first_of(L"\"") - 1));
 			if(out.getOriginalText().length() > 0)
 				this->arrayTexts.push_back(out);
 		}
@@ -101,13 +108,15 @@ namespace depozit
 		size_t start;
 		size_t end;
 		depozit::text out;
-		for(i; i<=j; i++){
-			start = fileByLine[i].find_first_of(L"\"");
-			end = fileByLine[i].find_last_of(L"\"");
-			out.init(i, type::description, fileByLine[i].substr(start + 1, end - start - 1));
-			if(out.getOriginalText().length() > 0 && out.getOriginalText().find(L"{") == std::wstring::npos)
-				this->arrayTexts.push_back(out);
-			out.clear();
+		for (i; i <= j; i++) {
+			if (fileByLine[i].find(L"\"") != std::wstring::npos) {
+				start = fileByLine[i].find_first_of(L"\"");
+				end = fileByLine[i].find_last_of(L"\"");
+				out.init(i, type::description, fileByLine[i].substr(start + 1, end - start - 1));
+				if (out.getOriginalText().length() > 0 && out.getOriginalText().find(L"{") == std::wstring::npos)
+					this->arrayTexts.push_back(out);
+				out.clear();
+			}
 		}
 	}
 }
