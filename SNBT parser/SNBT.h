@@ -19,8 +19,9 @@ namespace depozit {
 		unknown
 	};
 
-	std::wstring stringToWstring(const std::string& str);
-	std::string wstringToString(const std::wstring& wstr);
+	std::wstring stringToWstring(const std::string&);
+	std::string wstringToString(const std::wstring&);
+	type wstringToType(const std::wstring&);
 
 	class text
 	{

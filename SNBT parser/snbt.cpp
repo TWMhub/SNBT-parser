@@ -61,7 +61,7 @@ namespace depozit
 		if(this->fullFile.find(L"quests") != std::wstring::npos){
 			int startLine = 0;
 			for (int i = 0; i < fileByLine.size(); i++) {
-				if (fileByLine[i].find(L"quests") == std::wstring::npos) {
+				if (fileByLine[i].find(L"quests") != std::wstring::npos) {
 					startLine = i;
 					break;
 				}
@@ -108,14 +108,24 @@ namespace depozit
 		size_t start;
 		size_t end;
 		depozit::text out;
-		for (i; i <= j; i++) {
-			if (fileByLine[i].find(L"\"") != std::wstring::npos) {
-				start = fileByLine[i].find_first_of(L"\"");
-				end = fileByLine[i].find_last_of(L"\"");
-				out.init(i, type::description, fileByLine[i].substr(start + 1, end - start - 1));
-				if (out.getOriginalText().length() > 0 && out.getOriginalText().find(L"{") == std::wstring::npos)
-					this->arrayTexts.push_back(out);
-				out.clear();
+		if (i == j) {
+			start = fileByLine[i].find_first_of(L"\"");
+			end = fileByLine[i].find_last_of(L"\"");
+			out.init(i, type::description, fileByLine[i].substr(start + 1, end - start - 1));
+			if (out.getOriginalText().length() > 0 && out.getOriginalText().find(L"{") == std::wstring::npos)
+				this->arrayTexts.push_back(out);
+			out.clear();
+		}
+		else {
+			for (i; i <= j; i++) {
+				if (fileByLine[i].find(L"\"") != std::wstring::npos) {
+					start = fileByLine[i].find_first_of(L"\"");
+					end = fileByLine[i].find_last_of(L"\"");
+					out.init(i, type::description, fileByLine[i].substr(start + 1, end - start - 1));
+					if (out.getOriginalText().length() > 0 && out.getOriginalText().find(L"{") == std::wstring::npos)
+						this->arrayTexts.push_back(out);
+					out.clear();
+				}
 			}
 		}
 	}
